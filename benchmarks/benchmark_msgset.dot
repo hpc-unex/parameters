@@ -1,0 +1,23 @@
+digraph
+{
+	rankdir = BT;
+
+	node [fontsize = 8, shape = record];
+	MPIB_precision [label = "{MPIB_precision|+ min_reps : int\l+ max_reps : int\l+ cl : double\l+ eps : double\l}"];
+	MPIB_msgset [label = "{MPIB_msgset|+ min_size : int\l+ max_size : int\l+ max_diff : double\l+ min_stride : int\l+ max_num : int\l}"];
+	MPIB_result_1 [label = "{MPIB_result[1]|+ M : int\l+ T : double\l+ wtick : double\l+ reps : int\l+ ci : double\l}"];
+	MPIB_result_k [label = "{MPIB_result[k]|+ M : int\l+ T : double\l+ wtick : double\l+ reps : int\l+ ci : double\l}"];
+	benchmark [label = "Benchmark\nfunction", style = filled, fillcolor = lightgrey];
+	node [height = 0.2];
+	MPIB_p2p_container;
+	MPIB_coll_container;
+	{rank = same; MPIB_precision benchmark MPIB_result_1 MPIB_result_k}
+
+	benchmark -> MPIB_msgset [arrowhead = none, arrowtail = open];
+
+	edge [arrowhead = open];
+	MPIB_precision -> benchmark -> MPIB_result_1;
+	MPIB_result_1 -> MPIB_result_k [style = invis];
+	MPIB_p2p_container -> benchmark;
+	MPIB_coll_container -> benchmark;
+}

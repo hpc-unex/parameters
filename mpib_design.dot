@@ -1,0 +1,21 @@
+digraph {
+	node [shape = box, fontsize = 8, height = 0.4];
+	benchmarks [label = "Benchmarks library:\nlibmpib.a"];
+	p2p [label = "P2P library:\nlibmpib_p2p.a"];
+	collectives [label = "Collectives libraries:\nlibmpib_coll.so"];
+	executables [label = "Tools & Tests:\np2p, collective"];
+	utilities [label = "3d-party utilities:\ngnuplot, dot"];
+
+	node [shape = ellipse];
+	outputs [label = "Measurement results,\nCommunication trees"];
+	graphs [label = "Diagrams"];
+
+	{rank = same; executables outputs}
+	{rank = same; utilities graphs}
+
+	benchmarks -> executables -> utilities [dir = none, weight = 10];
+	p2p -> executables [dir = none];
+	collectives -> executables [dir = none];
+	outputs -> graphs [style = invis, weight = 2];
+	executables -> outputs -> utilities -> graphs;
+}
