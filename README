@@ -4,9 +4,13 @@ Patching
 
 This repository constains a patch for MPIBlib tool developed by Vladimir Rychkov, Alexey Lastovetsky and Kiril Dichev.
 To apply this patch download original mpiblib 1.2.0 version from https://hcl.ucd.ie/project/mpiblib.
-After that, include this patch file into mpiblib folder and use the following command to apply the patch:
+After that, include this patch file into mpiblib folder and use the patch command to apply the patch.
 
-$ patch -p3 < ../<your_route>/mpilib-mod.patch
+-Instructions:
+
+$ cp -r ~/mpiblib.patch ~/mpiblib-1.2.0
+$ cd ~/mpiblib-1.2.0
+$ patch -p1 < mpiblib.patch
 
 Now we can proceed with the next steps.
 
