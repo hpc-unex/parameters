@@ -71,6 +71,11 @@ mpirun -n 2 p2p -m 2 -M 500000
 
 Where -n are number of processes, p2p is the binary created, -m is the minimun msg size and -M is the maximum. You can configure stride between message with -s
 
+In the results we can see the different parameters of tau-lop.
+First, it shows the results for Overhead Eager, used for o0 (m) for the whole range of messages and o1 (m) for eager protocol.
+Secondly, it shows results for Overhead Rendevouz, used when o1 (m) for rendevouz protocol.
+Finally, it shows the transfer times L0 and L1 for the number of processes indicated in the call.
+
 
 To create a package:
 $ svn log -v > ChangeLog
