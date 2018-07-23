@@ -61,6 +61,7 @@ Configuration
 Packages:
   --with-gsl-dir=DIR      GNU Scientific Library directory
   --with-boost-dir=DIR    The Boost C++ libraries directory
+  --with-taulop=DIR       TauLop libraries directory
 
 Check configure options:
 $ ./configure -h
