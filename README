@@ -1,14 +1,4 @@
-============
-Patching
-============
 
-This repository constains a patch for MPIBlib tool developed by Vladimir Rychkov, Alexey Lastovetsky and Kiril Dichev.
-To apply this patch download original mpiblib 1.2.0 version from https://hcl.ucd.ie/project/mpiblib.
-After that, include this patch file into mpiblib folder and use the following command to apply the patch:
-
-$ patch -p3 < ../<your_route>/mpilib-mod.patch
-
-Now we can proceed with the next steps.
 
 ============
 Installation
@@ -57,6 +47,7 @@ Configuration
 Packages:
   --with-gsl-dir=DIR      GNU Scientific Library directory
   --with-boost-dir=DIR    The Boost C++ libraries directory
+  --with-taulop=DIR       TauLop libraries directory
 
 Check configure options:
 $ ./configure -h
@@ -74,6 +65,21 @@ $ cd MPIBlib
 $ autoreconf -i
 $ ./configure --enable-debug
 $ make all
+
+Patching:
+------------
+
+This repository constains a patch for MPIBlib tool developed by Vladimir Rychkov, Alexey Lastovetsky and Kiril Dichev.
+To apply this patch download original mpiblib 1.2.0 version from https://hcl.ucd.ie/project/mpiblib.
+After that, include this patch file into mpiblib folder and use the patch command to apply the patch.
+
+-Instructions:
+
+$ cp -r ~/mpiblib.patch ~/mpiblib-1.2.0
+$ cd ~/mpiblib-1.2.0
+$ patch -p1 < mpiblib.patch
+
+Now we can proceed with the next steps.
 
 How to use:
 ------------
