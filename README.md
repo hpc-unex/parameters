@@ -112,11 +112,11 @@ After that, include this patch file into mpiblib folder and use the patch comman
 
 Instructions:
 
-``$ cp -r ~/mpiblib.patch ~/mpiblib-1.2.0``
+``$ cp -r ~/mpiblib_taulop.patch ~/mpiblib-1.2.0``
 
 ``$ cd ~/mpiblib-1.2.0``
 
-``$ patch -p1 < mpiblib.patch``
+``$ patch -p1 < mpiblib_taulop.patch``
 
 Now we can proceed with the next steps.
 
