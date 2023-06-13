@@ -1,11 +1,3 @@
-Only in mpiblib-1.2.0: .Makefile.am.icloud
-Only in mpiblib-1.2.0: .Makefile.in.icloud
-Only in mpiblib-1.2.0: .acinclude.m4.icloud
-Only in mpiblib-1.2.0: .aclocal.m4.icloud
-Only in mpiblib-1.2.0: .aminclude.am.icloud
-Only in mpiblib-1.2.0: .config.h.in.icloud
-Only in mpiblib-1.2.0: .configure.ac.icloud
-Only in mpiblib-1.2.0: .mpib_design.dot.icloud
 diff -ru mpiblib-1.2.0/INSTALL mpiblib-1.2.0_TAULOP/INSTALL
 --- mpiblib-1.2.0/INSTALL	2010-09-12 12:09:52
 +++ mpiblib-1.2.0_TAULOP/INSTALL	2023-05-30 11:45:52
@@ -535,13 +527,7 @@ Only in mpiblib-1.2.0_TAULOP: acinclude.m4
 Only in mpiblib-1.2.0_TAULOP: aclocal.m4
 Only in mpiblib-1.2.0_TAULOP: aminclude.am
 Only in mpiblib-1.2.0_TAULOP: autom4te.cache
-Only in mpiblib-1.2.0/benchmarks: .Makefile.am.icloud
-Only in mpiblib-1.2.0/benchmarks: .Makefile.in.icloud
-Only in mpiblib-1.2.0/benchmarks: .benchmark.dot.icloud
-Only in mpiblib-1.2.0/benchmarks: .benchmark_msgset.dot.icloud
-Only in mpiblib-1.2.0/benchmarks: .coll_containers.dot.icloud
 Only in mpiblib-1.2.0_TAULOP/benchmarks: .deps
-Only in mpiblib-1.2.0/benchmarks: .modules.dot.icloud
 Only in mpiblib-1.2.0_TAULOP/benchmarks: Makefile
 Only in mpiblib-1.2.0_TAULOP/benchmarks: Makefile.am
 Only in mpiblib-1.2.0_TAULOP/benchmarks: Makefile.in
@@ -575,8 +561,8 @@ Only in mpiblib-1.2.0_TAULOP/benchmarks: mpib_computation.h
 Only in mpiblib-1.2.0_TAULOP/benchmarks: mpib_computation.o
 diff -ru mpiblib-1.2.0/benchmarks/mpib_getopt.c mpiblib-1.2.0_TAULOP/benchmarks/mpib_getopt.c
 --- mpiblib-1.2.0/benchmarks/mpib_getopt.c	2011-06-07 16:24:28
-+++ mpiblib-1.2.0_TAULOP/benchmarks/mpib_getopt.c	2023-05-30 08:28:57
-@@ -9,214 +9,285 @@
++++ mpiblib-1.2.0_TAULOP/benchmarks/mpib_getopt.c	2023-06-12 19:57:23
+@@ -9,214 +9,292 @@
  #include "mpib_shared.h"
  
  void MPIB_getopt_help_default(int* exit) {
@@ -649,14 +635,15 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_getopt.c mpiblib-1.2.0_TAULOP/benchmarks/
 +   strcpy(msgset->gamma_file, "gamma.txt");                /* output_file */
 +   strcpy(msgset->parameter,     "mpiblib");               /* taulop, mpiblib */
 +   strcpy(msgset->network_type,  "SHM");                   /* SHM, TCP, IB, ARIES, etc. */
-+   msgset->threshold     = 131072;                         /* Eager to rendezvous at 128KB */
++   msgset->threshold     = 0;                              /* Eager to rendezvous at 128KB */
++   msgset->segmentsize   = 0;                              /* Segment size for p2p messages in shm */
 +   msgset->input_sz_file = NULL;                           /* default: empty */
 +   msgset->tau           = 1;                              /* Maximim number of concurrent transmissions to measure */
  }
  
  const char* MPIB_getopt_msgset_options() {
 -	return "hm:M:S:d:s:n:";
-+   return "hm:M:S:d:s:n:o:t:g:b:z:H:C:T:";
++   return "hm:M:S:d:s:n:o:t:g:b:z:H:C:T:k:";
  }
  
  void MPIB_getopt_msgset_optarg(int c, MPIB_msgset* msgset) {
@@ -708,6 +695,7 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_getopt.c mpiblib-1.2.0_TAULOP/benchmarks/
 +-b I			(tauLop) measured parameters (taulop/MPIBlib) (default: %s)\n\
 +-z I			(taulop) input <sizes> file (default %s)\n\
 +-H I			(tauLop) threshold overhead eager to rendezvous (default: %d)\n\
++-k I        (tauLop) Segment size for SHM p2p messages (default: %d)\n\
 +-C I			(tauLop) network type label (SHM, TCP, IB, ARIES, etc.) (default: %s)\n\
 +-T I			(tauLop) Maximum concurrent transmissions (tau) (default: %d)",
 +                 msgset->min_size,
@@ -722,6 +710,7 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_getopt.c mpiblib-1.2.0_TAULOP/benchmarks/
 +                 msgset->parameter,
 +                 msgset->input_sz_file,
 +                 msgset->threshold,
++                 msgset->segmentsize,
 +                 msgset->network_type,
 +                 msgset->tau
 +                 );
@@ -771,6 +760,10 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_getopt.c mpiblib-1.2.0_TAULOP/benchmarks/
 +
 +      case 'H':
 +         msgset->threshold = atoi(optarg);
++         break;
++
++      case 'k':
++         msgset->segmentsize = atoi(optarg);
 +         break;
 +
 +      case 'C':
@@ -1003,7 +996,7 @@ Only in mpiblib-1.2.0_TAULOP/benchmarks: mpib_measure_max.o
 Only in mpiblib-1.2.0_TAULOP/benchmarks: mpib_measure_root.o
 diff -ru mpiblib-1.2.0/benchmarks/mpib_measurement.h mpiblib-1.2.0_TAULOP/benchmarks/mpib_measurement.h
 --- mpiblib-1.2.0/benchmarks/mpib_measurement.h	2010-03-24 07:13:30
-+++ mpiblib-1.2.0_TAULOP/benchmarks/mpib_measurement.h	2023-05-30 08:29:48
++++ mpiblib-1.2.0_TAULOP/benchmarks/mpib_measurement.h	2023-06-12 19:59:50
 @@ -6,9 +6,9 @@
  /*!
   * \defgroup measurement Measurement: base data structures and functions
@@ -1042,7 +1035,7 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_measurement.h mpiblib-1.2.0_TAULOP/benchm
  /*! Creates a copy of communicator that includes one process per processor. */
  void MPIB_Comm(MPI_Comm comm, MPI_Comm* newcomm);
  
-@@ -86,6 +90,39 @@
+@@ -86,6 +90,44 @@
   	 * the measurement is performed for. Used in adaptive selection of message sizes.
   	 */
  	int max_num;
@@ -1069,6 +1062,11 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_measurement.h mpiblib-1.2.0_TAULOP/benchm
 +     */
 +	int threshold;
 +
++   /*
++     *  Segment size for p2p messages in shared memory.
++     */
++   int segmentsize;
++
 +	/*
 +	* Input size file
 +	*/
@@ -1082,7 +1080,7 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_measurement.h mpiblib-1.2.0_TAULOP/benchm
  }
  MPIB_msgset;
  
-@@ -112,13 +149,13 @@
+@@ -112,13 +154,13 @@
   * and use t distribution to estimate confidence interval.
   * \param cl confidence level
   * \param reps number of measurements (should be > 1)
@@ -1101,8 +1099,8 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_measurement.h mpiblib-1.2.0_TAULOP/benchm
 Only in mpiblib-1.2.0_TAULOP/benchmarks: mpib_measurement.o
 diff -ru mpiblib-1.2.0/benchmarks/mpib_output.c mpiblib-1.2.0_TAULOP/benchmarks/mpib_output.c
 --- mpiblib-1.2.0/benchmarks/mpib_output.c	2011-04-14 18:33:59
-+++ mpiblib-1.2.0_TAULOP/benchmarks/mpib_output.c	2023-05-30 16:51:36
-@@ -5,201 +5,343 @@
++++ mpiblib-1.2.0_TAULOP/benchmarks/mpib_output.c	2023-06-13 18:46:22
+@@ -5,201 +5,354 @@
  
  void MPIB_print_processors(MPI_Comm comm)
  {
@@ -1473,19 +1471,29 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_output.c mpiblib-1.2.0_TAULOP/benchmarks/
 +/* RICO: print taulop results for overhead and transfer time in files */
 +
 +void MPIB_print_result_overhead_header(FILE *f) {
-+   fprintf(f,"#size\to(m)\n");
++   fprintf(f,"#size\to(m)_eager\to(m)_rndv\n");
 +   fflush(stdout);
 +}
 +
 +
-+void MPIB_print_result_overhead_value(MPIB_result result,FILE *f) {
-+   fprintf(f,"%d\t%0.12f\n",
-+           result.M,
-+           result.T
-+           //result.wtick < result.T,
-+           //result.reps,
-+           //result.ci
++//void MPIB_print_result_overhead_value(int count, MPIB_result arr[count][2], FILE *f) {
++void MPIB_print_result_overhead_value(int count, MPIB_result **arr, FILE *f) {
++   /*fprintf(f,"%d\t%0.12f\n",
++           arr.M,
++           arr.T
++           //arr.wtick < result.T,
++           //arr.reps,
++           //arr.ci
 +           );
++   */
++   for (int m = 0; m < count; m++) {
++      fprintf(f, "%d\t", arr[m][0].M);
++      for (int prt = 0; prt < 2; prt++) {
++         fprintf(f, "%0.12f\t", arr[m][prt].T);
++      }
++      fprintf(f, "\n");
++   }
++
 +   fflush(stdout);
 +}
 +
@@ -1531,6 +1539,7 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_output.c mpiblib-1.2.0_TAULOP/benchmarks/
 +   //fprintf(f,"#f\t%s\n", msgset.input_file_o);
 +   //fprintf(f,"#l\t%s\n", msgset.input_file_l);
 +   fprintf(f,"#H\t%d\n", msgset.threshold);
++   fprintf(f,"#k\t%d\n", msgset.segmentsize);
 +   fprintf(f,"#C\t%s\n", msgset.network_type);
 +   fprintf(f,"#n\t%d\n", msgset.max_num);
 +   fprintf(f,"#min_reps\t%d\n", precision.min_reps);
@@ -1576,7 +1585,7 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_output.c mpiblib-1.2.0_TAULOP/benchmarks/
 +}
 diff -ru mpiblib-1.2.0/benchmarks/mpib_output.h mpiblib-1.2.0_TAULOP/benchmarks/mpib_output.h
 --- mpiblib-1.2.0/benchmarks/mpib_output.h	2011-05-18 19:07:39
-+++ mpiblib-1.2.0_TAULOP/benchmarks/mpib_output.h	2023-05-30 16:52:56
++++ mpiblib-1.2.0_TAULOP/benchmarks/mpib_output.h	2023-06-13 18:46:45
 @@ -2,6 +2,7 @@
  #define MPIB_OUTPUT_H_
  
@@ -1602,7 +1611,7 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_output.h mpiblib-1.2.0_TAULOP/benchmarks/
  
  void MPIB_print_result_th();
  void MPIB_print_result_tr(MPIB_result result);
-@@ -66,6 +74,19 @@
+@@ -66,6 +74,20 @@
   * \param result measurement result
   */
  void MPIB_print_coll_tr(int M, MPIB_result result);
@@ -1610,7 +1619,8 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_output.h mpiblib-1.2.0_TAULOP/benchmarks/
 +
 +/* RICO: print results in files for overhead and transfer times */
 +void MPIB_print_result_overhead_header(FILE *f);
-+void MPIB_print_result_overhead_value(MPIB_result result,FILE *f);
++//void MPIB_print_result_overhead_value(int count, MPIB_result arr[count][2], FILE *f);
++void MPIB_print_result_overhead_value(int count, MPIB_result **arr, FILE *f);
 +
 +void MPIB_print_transfert_header (FILE *f, int tau);
 +void MPIB_print_result_transfert_value(int tau, int count, MPIB_result arr[count][tau], FILE *f);
@@ -1625,8 +1635,8 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_output.h mpiblib-1.2.0_TAULOP/benchmarks/
 Only in mpiblib-1.2.0_TAULOP/benchmarks: mpib_output.o
 diff -ru mpiblib-1.2.0/benchmarks/mpib_p2p_benchmarks.c mpiblib-1.2.0_TAULOP/benchmarks/mpib_p2p_benchmarks.c
 --- mpiblib-1.2.0/benchmarks/mpib_p2p_benchmarks.c	2011-04-14 18:36:08
-+++ mpiblib-1.2.0_TAULOP/benchmarks/mpib_p2p_benchmarks.c	2023-05-30 12:59:10
-@@ -4,250 +4,808 @@
++++ mpiblib-1.2.0_TAULOP/benchmarks/mpib_p2p_benchmarks.c	2023-06-12 20:30:56
+@@ -4,250 +4,839 @@
  #include <string.h>
  #include "mpib_output.h"
  #include "mpib_utilities.h"
@@ -2121,7 +2131,7 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_p2p_benchmarks.c mpiblib-1.2.0_TAULOP/ben
 + ********************              Overhead              *******************
 + ***************************************************************************/
 +
-+void MPIB_measure_overhead (MPIB_p2p_container* container, MPI_Comm comm, int measure, int mirror, MPIB_msgset msgset, MPIB_precision precision, int *sizes, int nlines, int* count, MPIB_result** results)
++void MPIB_measure_overhead (MPIB_p2p_container* container, MPI_Comm comm, int measure, int mirror, MPIB_msgset msgset, MPIB_precision precision, int *sizes, int nlines, int* count, MPIB_result** results, int protocol)
 +{
 +   int rank;
 +   MPI_Comm_rank(comm, &rank);
@@ -2150,7 +2160,7 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_p2p_benchmarks.c mpiblib-1.2.0_TAULOP/ben
 +      }
 +
 +      if ((rank == measure) && MPIB_verbose) {
-+         fprintf(stdout, "\n(taulop) Measuring Overhead parameter ...\n");
++         fprintf(stdout, "\n(taulop) Measuring Overhead parameter (protocol: %s)...\n", (protocol==0)? "eager" : "rendezvous");
 +         fflush(stdout);
 +      }
 +
@@ -2173,7 +2183,7 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_p2p_benchmarks.c mpiblib-1.2.0_TAULOP/ben
 +          */
 +         while (!stop && reps < precision.max_reps) {
 +
-+            if (M < H) {  // EAGER
++            if (protocol == 0) {  // EAGER
 +
 +               if (rank == measure) {
 +                  MPI_Recv(NULL, 0, MPI_CHAR, mirror, 0, comm, MPI_STATUS_IGNORE);
@@ -2216,7 +2226,18 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_p2p_benchmarks.c mpiblib-1.2.0_TAULOP/ben
 +
 +         }
 +
-+         double t = sum / reps;
++         // RICO: average time of the lasts reps (arbitrary 10)
++         double t = 0.0;
++         if (rank == measure) {
++            int last_reps = (reps > 10) ? 10 : reps;
++            sum = 0.0;
++            for (int i = 1; i <= last_reps; i++) {
++               sum = sum + T[reps-i];
++            }
++            t = sum / last_reps;
++         }
++         
++         //double t = sum / reps;
 +         if ((rank == measure) && MPIB_verbose) {
 +            //double t_adapted = MPIB_adapt_overhead_eager(sum / reps, M);
 +            fprintf(stdout, "[%d] \t size: %d \t time: %0.12lf \t nreps: %d \t (confidence level: %0.12f)\n",
@@ -2271,7 +2292,7 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_p2p_benchmarks.c mpiblib-1.2.0_TAULOP/ben
 +
 +            } else if (msgset.input_sz_file != NULL) {
 +               M = sizes[++pos];
-+
++                              
 +            } else {
 +               //M += msgset.stride;
 +               // Avoiding starting in 1 problem.
@@ -2282,7 +2303,9 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_p2p_benchmarks.c mpiblib-1.2.0_TAULOP/ben
 +         }
 +         MPI_Bcast(&M, 1, MPI_INT, measure, comm);
 +      }
-+      free(T);
++      if (T != NULL) {
++         free(T);
++      }
 +   }
 +}
 +
@@ -2291,7 +2314,7 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_p2p_benchmarks.c mpiblib-1.2.0_TAULOP/ben
 +/***************************************************************************
 + ********************         TRANSFER TIME	             *******************
 + ***************************************************************************/
-+void MPIB_measure_transfert (MPIB_p2p_container* container, MPI_Comm comm, int measure, int mirror, MPIB_msgset msgset, MPIB_precision precision, int *sizes, int nlines, int* count, MPIB_result *overhead, MPIB_result** results, int tau, int isSendRecv)
++void MPIB_measure_transfert (MPIB_p2p_container* container, MPI_Comm comm, int measure, int mirror, MPIB_msgset msgset, MPIB_precision precision, int *sizes, int nlines, int* count, MPIB_result** results, int tau, int isSendRecv)
 +{
 +   int rank;
 +   int source;
@@ -2388,8 +2411,18 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_p2p_benchmarks.c mpiblib-1.2.0_TAULOP/ben
 +            }
 +         }
 +
-+         // Maximum time
-+         double t = sum / reps;
++         // RICO: average time of the last reps (arbitrary 10):
++         double t = 0.0;
++         if (rank == measure) {
++            int last_reps = (reps > 10) ? 10 : reps;
++            sum = 0.0;
++            for (int i = 1; i <= last_reps; i++) {
++               sum = sum + T[reps-i];
++            }
++            t = sum / last_reps;
++         }
++         
++         //double t = sum / reps;
 +         if (rank == 0) {
 +            MPI_Reduce(MPI_IN_PLACE, &t, 1, MPI_DOUBLE, MPI_MAX, 0, comm);
 +         } else {
@@ -2596,8 +2629,16 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_p2p_benchmarks.c mpiblib-1.2.0_TAULOP/ben
 +         free(a);
 +         free(b);
 +
-+         // Average time
-+         double t = sum / reps;
++         // RICO: average time of the last reps (arbitrary 10):
++         double t = 0.0;
++         int last_reps = (reps > 10) ? 10 : reps;
++         sum = 0.0;
++         for (int i = 1; i <= last_reps; i++) {
++            sum = sum + T[reps-i];
++         }
++         t = sum / last_reps;
++         
++         //double t = sum / reps;
 +
 +         if (MPIB_verbose) {
 +            fprintf(stdout, "[%d] \t size: %d \t Op: %d \t time: %0.12f \t nreps: %d \t (confidence level: %0.12f)\n", rank, M, op, t, reps, ci);
@@ -2670,7 +2711,7 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_p2p_benchmarks.c mpiblib-1.2.0_TAULOP/ben
  }
 diff -ru mpiblib-1.2.0/benchmarks/mpib_p2p_benchmarks.h mpiblib-1.2.0_TAULOP/benchmarks/mpib_p2p_benchmarks.h
 --- mpiblib-1.2.0/benchmarks/mpib_p2p_benchmarks.h	2011-03-11 14:43:35
-+++ mpiblib-1.2.0_TAULOP/benchmarks/mpib_p2p_benchmarks.h	2023-05-30 11:59:38
++++ mpiblib-1.2.0_TAULOP/benchmarks/mpib_p2p_benchmarks.h	2023-06-12 17:30:20
 @@ -82,6 +82,20 @@
  	void (*execute_mirror)(void* _this, MPI_Comm comm, int M, int measure);
  	/*! Finalization of buffers required for the communication operation */
@@ -2703,40 +2744,40 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_p2p_benchmarks.h mpiblib-1.2.0_TAULOP/ben
 +void MPIB_measure_overhead (MPIB_p2p_container* container,
 +                            MPI_Comm comm,
 +                            int measure,
-+														int mirror,
-+														MPIB_msgset msgset,
-+														MPIB_precision precision,
-+														int *sizes,
-+														int nlines,
-+														int* count,
-+														MPIB_result** results);
++									 int mirror,
++									 MPIB_msgset msgset,
++									 MPIB_precision precision,
++									 int *sizes,
++									 int nlines,
++									 int* count,
++                            MPIB_result** results,
++                            int protocol);
 +
 +
 +void MPIB_measure_transfert (MPIB_p2p_container* container,
-+	                           MPI_Comm comm,
++	                          MPI_Comm comm,
 +                             int measure,
-+									           int mirror,
++                             int mirror,
 +                             MPIB_msgset msgset,
 +                             MPIB_precision precision,
 +                             int *sizes,
 +                             int nlines,
 +                             int* count,
-+                             MPIB_result *overhead,
 +                             MPIB_result** results,
 +                             int tau,
 +                             int isSendRecv);
 +
 +
 +void MPIB_measure_gamma (MPIB_p2p_container* container,
-+	                       MPI_Comm comm,
-+												 int rank,
-+												 int op,
-+												 MPIB_msgset msgset,
-+												 MPIB_precision precision,
-+												 int *sizes,
-+												 int nlines,
-+												 int* count,
-+												 MPIB_result** results);
++                         MPI_Comm comm,
++								 int rank,
++								 int op,
++								 MPIB_msgset msgset,
++								 MPIB_precision precision,
++								 int *sizes,
++								 int nlines,
++								 int* count,
++								 MPIB_result** results);
  
  #ifdef __cplusplus
  }
@@ -2841,8 +2882,6 @@ diff -ru mpiblib-1.2.0/benchmarks/mpib_p2p_containers.cpp mpiblib-1.2.0_TAULOP/b
 -
 Only in mpiblib-1.2.0_TAULOP/benchmarks: mpib_p2p_containers.o
 Only in mpiblib-1.2.0_TAULOP/benchmarks: mpib_utilities.o
-Only in mpiblib-1.2.0/build-aux: .config.guess.icloud
-Only in mpiblib-1.2.0/build-aux: .config.sub.icloud
 diff -ru mpiblib-1.2.0/build-aux/compile mpiblib-1.2.0_TAULOP/build-aux/compile
 --- mpiblib-1.2.0/build-aux/compile	2011-06-08 19:04:00
 +++ mpiblib-1.2.0_TAULOP/build-aux/compile	2023-05-30 11:45:52
@@ -17347,11 +17386,8 @@ diff -ru mpiblib-1.2.0/build-aux/missing mpiblib-1.2.0_TAULOP/build-aux/missing
 +# time-stamp-time-zone: "UTC0"
  # time-stamp-end: "; # UTC"
  # End:
-Only in mpiblib-1.2.0/collectives: .Makefile.am.icloud
-Only in mpiblib-1.2.0/collectives: .Makefile.in.icloud
 Only in mpiblib-1.2.0_TAULOP/collectives: .deps
 Only in mpiblib-1.2.0_TAULOP/collectives: .libs
-Only in mpiblib-1.2.0/collectives: .tree_collectives.dot.icloud
 Only in mpiblib-1.2.0_TAULOP/collectives: Makefile
 Only in mpiblib-1.2.0_TAULOP/collectives: Makefile.am
 Only in mpiblib-1.2.0_TAULOP/collectives: Makefile.in
@@ -31057,8 +31093,6 @@ diff -ru mpiblib-1.2.0/configure mpiblib-1.2.0_TAULOP/configure
 Only in mpiblib-1.2.0_TAULOP: configure.ac
 Only in mpiblib-1.2.0_TAULOP: libtool
 Only in mpiblib-1.2.0_TAULOP: mpib_design.dot
-Only in mpiblib-1.2.0/p2p: .Makefile.am.icloud
-Only in mpiblib-1.2.0/p2p: .Makefile.in.icloud
 Only in mpiblib-1.2.0_TAULOP/p2p: .deps
 Only in mpiblib-1.2.0_TAULOP/p2p: Makefile
 Only in mpiblib-1.2.0_TAULOP/p2p: Makefile.am
@@ -31101,8 +31135,6 @@ diff -ru mpiblib-1.2.0/p2p/mpib_p2p_sg.c mpiblib-1.2.0_TAULOP/p2p/mpib_p2p_sg.c
 Only in mpiblib-1.2.0_TAULOP/p2p: mpib_p2p_sg.o
 Only in mpiblib-1.2.0_TAULOP: stamp-h1
 Only in mpiblib-1.2.0_TAULOP: taulop
-Only in mpiblib-1.2.0/tests: .Makefile.am.icloud
-Only in mpiblib-1.2.0/tests: .Makefile.in.icloud
 Only in mpiblib-1.2.0_TAULOP/tests: .deps
 Only in mpiblib-1.2.0_TAULOP/tests: .libs
 Only in mpiblib-1.2.0_TAULOP/tests: Makefile
@@ -31120,12 +31152,8 @@ Only in mpiblib-1.2.0_TAULOP/tests: substitute
 Only in mpiblib-1.2.0_TAULOP/tests: substitute-substitute.o
 Only in mpiblib-1.2.0_TAULOP/tests: tree_builders
 Only in mpiblib-1.2.0_TAULOP/tests: tree_builders.o
-Only in mpiblib-1.2.0/tools: .Makefile.am.icloud
-Only in mpiblib-1.2.0/tools: .Makefile.in.icloud
-Only in mpiblib-1.2.0/tools: .collective.plot.icloud
 Only in mpiblib-1.2.0_TAULOP/tools: .deps
 Only in mpiblib-1.2.0_TAULOP/tools: .libs
-Only in mpiblib-1.2.0/tools: .p2p.plot.icloud
 Only in mpiblib-1.2.0_TAULOP/tools: Makefile
 Only in mpiblib-1.2.0_TAULOP/tools: Makefile.am
 Only in mpiblib-1.2.0_TAULOP/tools: Makefile.in
@@ -31140,7 +31168,7 @@ Only in mpiblib-1.2.0_TAULOP/tools: mpib_test.o
 Only in mpiblib-1.2.0_TAULOP/tools: p2p
 diff -ru mpiblib-1.2.0/tools/p2p.c mpiblib-1.2.0_TAULOP/tools/p2p.c
 --- mpiblib-1.2.0/tools/p2p.c	2011-06-08 11:11:00
-+++ mpiblib-1.2.0_TAULOP/tools/p2p.c	2023-05-30 18:29:21
++++ mpiblib-1.2.0_TAULOP/tools/p2p.c	2023-06-13 18:45:33
 @@ -2,14 +2,14 @@
   * \page p2p P2P benchmark
   * Performs adaptive p2p benchmark between a pair of processors 0-1.
@@ -31158,7 +31186,7 @@ diff -ru mpiblib-1.2.0/tools/p2p.c mpiblib-1.2.0_TAULOP/tools/p2p.c
   * \b p2p.plot draws the graph of the execution time (sec) against message size (kb).
   * - input: p2p.out
   * - output: p2p.eps (0-1 with error bars)
-@@ -25,79 +25,417 @@
+@@ -25,79 +25,484 @@
  #include <getopt.h>
  #include <malloc.h>
  #include <string.h>
@@ -31209,7 +31237,8 @@ diff -ru mpiblib-1.2.0/tools/p2p.c mpiblib-1.2.0_TAULOP/tools/p2p.c
 -	MPIB_getopt_precision_bcast(&precision, 0, comm);
 -	MPIB_getopt_p2p_bcast(&parallel, &p2p_type, &proc_num_spawned, 0, comm);
 +/* RICO:  Results */
-+void print_results_overhead (int count, MPIB_result* results, FILE *f){
++//void print_results_overhead (int count, MPIB_result arr[count][2], FILE *f){
++void print_results_overhead (int count, MPIB_result **arr, FILE *f) {
  
 -	if (rank == 0)
 -		printf("#p2p adaptive benchmark 0-1\n#\n");
@@ -31219,6 +31248,8 @@ diff -ru mpiblib-1.2.0/tools/p2p.c mpiblib-1.2.0_TAULOP/tools/p2p.c
 -		MPIB_print_precision(precision);
 -	}
 +   MPIB_print_result_overhead_header(f);
++   MPIB_print_result_overhead_value(count, arr, f);
++}
  
 -	if (p2p_type == 1)
 -		p2p_init(comm, proc_num_spawned);
@@ -31241,11 +31272,6 @@ diff -ru mpiblib-1.2.0/tools/p2p.c mpiblib-1.2.0_TAULOP/tools/p2p.c
 -		p2p_finalize();
 -	MPI_Finalize();
 -	return 0;
-+   for (int i = 0; i < count; i++){
-+      MPIB_print_result_overhead_value(results[i],f);
-+   }
-+}
-+
 +
 +void print_results_transfertime (int count, int num_procs, MPIB_result arr[count][num_procs], FILE *f) {
 +
@@ -31436,23 +31462,84 @@ diff -ru mpiblib-1.2.0/tools/p2p.c mpiblib-1.2.0_TAULOP/tools/p2p.c
 +
 +
 +
-+      //fprintf(stderr, "[%d] FIN sizes file: %s  MIN:%d  MAX:%d\n", rank, msgset.input_sz_file, msgset.min_size, msgset.max_size); fflush(stderr);
-+
-+
 +      /* ======================================
 +       * ========	    OVERHEAD       =========
 +       * ======================================
 +       */
 +
 +      MPI_Comm comm = MPI_COMM_WORLD;
++      MPI_Group group_world;
++      MPI_Comm comm_pair;
 +
-+      MPIB_result* results_o = NULL;
-+      MPIB_measure_overhead(container, comm, 0, 1, msgset, precision, sizes, nlines, &count, &results_o);
++      // TODO: (RICO) There is a problem here. I need to define a matrix of countx2 for the (M,T) pairs
++      //              for each m, but at this point, I do not have count in mpiblib if I am not using
++      //              sizes.txt file (in that case, I have the nlines read).
++      //   FIX THIS !!!!
++      
++      /*
++      MPIB_result arr_O[nlines][2]; // We measure both EAGER and RENDEZVOUS protocols
++      for(int m = 0; m < nlines; m++) {
++         for(int prt = 0; prt < 2; prt++) {
++            arr_O[m][prt].T = 0.0;
++            arr_O[m][prt].M = 0;
++         }
++      }*/
++      MPIB_result ** arr_O = NULL;
++            
++      
++      /* Measure and mirror ranks communicator */
++      MPI_Group group_pair;
++      MPI_Comm_group (comm, &group_world);
++      int ranks_v_2[2] = {0, 1};
++      MPI_Group_incl(group_world, 2, ranks_v_2, &group_pair);
++      MPI_Comm_create(comm, group_pair, &comm_pair);
++      
++      if (comm_pair != MPI_COMM_NULL) {
++         
++         for(int prt = 0; prt < 2; prt++) {
++            
++            MPIB_result* results_o = NULL;
++            MPIB_measure_overhead(container, comm_pair, 0, 1, msgset, precision, sizes, nlines, &count, &results_o, prt);
++                    
++            // First time, create matrix
++            if (arr_O == NULL) {
++               
++               arr_O = (MPIB_result **) malloc (count * sizeof(MPIB_result *));
++               
++               for (int i = 0; i < count; i++) {
++                   arr_O[i] = (MPIB_result *) malloc (2 * sizeof(MPIB_result));
++               }
++               
++               for(int m = 0; m < count; m++) {
++                  for(int i = 0; i < 2; i++) {
++                     arr_O[m][i].T = 0.0;
++                     arr_O[m][i].M = 0;
++                  }
++               }
++            }
++            
++				// Set values
++            if(rank == 0) {
++               for (int m = 0; m < count; m++) {
++                  arr_O[m][prt].M = results_o[m].M;
++                  arr_O[m][prt].T = results_o[m].T;
++               }
++            }
++            
++         }
++      }
++      
++      if (comm_pair != MPI_COMM_NULL) {
++         MPI_Comm_free(&comm_pair);
++      }
++      
++      MPI_Group_free(&group_pair);
 +
 +      if (rank == 0) {
-+         print_results_overhead(count, results_o, f_overhead);
++         print_results_overhead(count, arr_O, f_overhead);
++         fclose(f_overhead);
 +      }
-+
++   
 +
 +      /* ======================================
 +       * ========	    GAMMA           =========
@@ -31499,6 +31586,7 @@ diff -ru mpiblib-1.2.0/tools/p2p.c mpiblib-1.2.0_TAULOP/tools/p2p.c
 +        }
 +
 +      }
++       
 +
 +      /* ======================================
 +       * ========	     TRANSFER       =========
@@ -31506,7 +31594,6 @@ diff -ru mpiblib-1.2.0/tools/p2p.c mpiblib-1.2.0_TAULOP/tools/p2p.c
 +       */
 +
 +      MPI_Comm new_comm;
-+      MPI_Group group_world;
 +      int proc = 0;
 +
 +      MPIB_result arr_T[count][max_tau];
@@ -31572,7 +31659,7 @@ diff -ru mpiblib-1.2.0/tools/p2p.c mpiblib-1.2.0_TAULOP/tools/p2p.c
 +         //if (color == 0) {
 +         if (new_comm != MPI_COMM_NULL) {
 +
-+            MPIB_measure_transfert(container, new_comm, 0, 1, msgset, precision, sizes, nlines+1, &count, results_o, &results_T, tau, isSendRecv);
++            MPIB_measure_transfert(container, new_comm, 0, 1, msgset, precision, sizes, nlines+1, &count, &results_T, tau, isSendRecv);
 +
 +            if(rank == 0) {
 +               for (int i = 0; i < count; i++) {
@@ -31598,9 +31685,16 @@ diff -ru mpiblib-1.2.0/tools/p2p.c mpiblib-1.2.0_TAULOP/tools/p2p.c
 +      }
 +
 +      if (rank == 0) {
-+         fclose(f_overhead);
++         //fclose(f_overhead);
 +         fclose(f_transfert);
 +      }
++      
++      // Overhead matrix:
++      for (int i = 0; i < count; i++) {
++         free(arr_O[i]);
++      }
++      free(arr_O);
++
 +
 +      /* Defult: timing by mpiblib */
 +   } else {
@@ -31629,6 +31723,7 @@ diff -ru mpiblib-1.2.0/tools/p2p.c mpiblib-1.2.0_TAULOP/tools/p2p.c
 +   if (p2p_type == 1)
 +      p2p_finalize();
 +
++      
 +   // RICO: MPI_Finalize();
 +   // RICO: close output file.
 +
